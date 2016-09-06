@@ -88,15 +88,17 @@ class parseXML
         
         $connection = $this->getConnection($arr);
 
-        foreach($arr as $node)
+        for($i = 0;$i<sizeof($arr);$i++)
         {
-            if(strcmp(strtoupper($node['type']),"SQL")==0)
+            if(strcmp(strtoupper($arr[$i]['type']),"SQL")==0)
             {
-                $node['detail_connection'] = $this->getDetailConnection($node['connection'],$connection);
+                $arr[$i]['connection'] = $this->getDetailConnection($arr[$i]['connection'],$connection);
+              
             }
+            //print_r($node);
         }
 
-        //print_r($arr);
+           // print_r($arr);
         return $arr;
     }
 

@@ -17,7 +17,7 @@ $(function () {
 				var data = JSON.parse(datas);
 				console.log(data);
 				//console.log(data.edge);
-				//console.log(data.node);
+				console.log(data.node);
 				for (var key in data.node) {
 					if (!data.node.hasOwnProperty(key)) continue;
 					data.node[key]['label'] = data.node[key]['name'];
@@ -257,7 +257,7 @@ function showFormDetailGraph(status,id, data, callback) {
 	$('#dvKJBJobName').toggle(status); // form untuk KJB
 	$('#dvKJBDirectory').toggle(status); // form untuk KJB */
 	$('#dvDetailGraph'+id).toggle(status); // form untuk KJB 
-	addDataDetail(data, id);
+	addDataDetail(data, id,"detail");
 	callback();
 }
 /*
@@ -396,22 +396,25 @@ function getOption() {
 	}
 } */
 
-function addDataDetail(data, count) {
+function addDataDetail(data, count,idName) {
 	for (var key in data) {
 		if (data.hasOwnProperty(key)) {
 			if (key == "label") break;
 			if (isObject(data[key])) {
-				addDataDetail(data[key], 1);
+				$("#"+idName).append("<div id='"+key+count+"' class='space-detail box-gray'></div>");
+				if (key.length > 2)
+					$("#"+key+count).append("<label>"+key+"</label>");
+				addDataDetail(data[key], 1,key+count);
 			} else {
-				var id = key + count;
-				stack.push(id);
+				//var id = key + count;
+				stack.push("dataDetail"+count);
 				if ($("#dvName" + count).length == 0) {
-					$('#detail').append(
-						"<div id='dataDetail" + count + "'</div>" +
+					$('#'+idName).append(
+						"<div id='dataDetail" + count + "'>" +
 						"<div class='space-pad' id='" + key + count + "'>" +
 						"<label>" + key + "</label>" +
 						"<div id='" + key + count + "' class='box-gray'>" + data[key] + "</div>" +
-						"</div>"
+						"</div></div>"
 					);
 				}
 			}
@@ -421,6 +424,8 @@ function addDataDetail(data, count) {
 
 function removeDetail(stacks) {
 	for (var key in stacks) {
+		console.log( stacks[key]);
+		$("#" + stacks[key]).empty();
 		$("#" + stacks[key]).remove();
 		stacks[key] = null;
 	}
