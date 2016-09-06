@@ -8,13 +8,13 @@ class parseXML
     function  __construct($directory)
     {
         $this->xml = new SimpleXMLElement($directory,null,true);
-        $this->dir = substr($directory,strrpos($directory,".")+1);
+        $this->ekstension = substr($directory,strrpos($directory,".")+1);
         //var_dump($this->dir);
     }
 
-    function getDir()
+    function getEkstension()
     {
-        return $this->dir;
+        return $this->ekstension;
     }
 
     /*function getEdge()
@@ -54,7 +54,7 @@ class parseXML
 
     function getInfo()
     {
-        if(strcmp(strtoupper($this->dir),"KTR")==0){
+        if(strcmp(strtoupper($this->ekstension),"KTR")==0){
              $xmlElement = $this->xml->info;
         }else
              $xmlElement = $this->xml;
@@ -77,13 +77,23 @@ class parseXML
     function getNode()
     {
         $xmlElement = $this->xml;
-        $parent = (strcmp(strtoupper($this->dir),"KJB")==0) ? "entries/entry" : "step";
+        $parent = (strcmp(strtoupper($this->ekstension),"KJB")==0) ? "entries/entry" : "step";
         $arr = array();
 
         $xmlParent = $xmlElement->xpath($parent);
         foreach($xmlParent as $node)
         {
             $arr[] = $this->xml2array($node);
+        }
+        
+        $connection = $this->getConnection($arr);
+
+        foreach($arr as $node)
+        {
+            if(strcmp(strtoupper($node['type']),"SQL")==0)
+            {
+                $node['detail_connection'] = $this->getDetailConnection($node['connection'],$connection);
+            }
         }
 
         //print_r($arr);
@@ -93,7 +103,7 @@ class parseXML
     function getEdge()
     {
         $xmlElement = $this->xml;
-        $parent = (strcmp(strtoupper($this->dir),"KJB")==0) ? "hops/hop" : "order/hop";
+        $parent = (strcmp(strtoupper($this->ekstension),"KJB")==0) ? "hops/hop" : "order/hop";
         $arr = array();
 
         $xmlParent = $xmlElement->xpath($parent);
@@ -112,6 +122,8 @@ class parseXML
 		return $fn[1];
 	}
 
+    
+
     function getConnection($node)
     {
         $xmlElement = $this->xml;
@@ -123,7 +135,17 @@ class parseXML
                 $arr[] = $this->xml2array($connection);
         }
 		
+
         return $arr;
+    }
+
+    private function getDetailConnection($connectionName,$listOfConnection)
+    {
+        foreach($listOfConnection as $conn)
+        {
+            if(strcmp(strtoupper($conn['name']),strtoupper($connectionName))==0)
+                return $conn;
+        }
     }
 
     private function getConnectionNameUsed($node)
