@@ -12,6 +12,11 @@ class parseXML
         //var_dump($this->dir);
     }
 
+    function getDir()
+    {
+        return $this->dir;
+    }
+
     /*function getEdge()
     {
         $xmlElement = $this->xml;
@@ -101,11 +106,38 @@ class parseXML
         return $arr;
     }
 
-     private function getFileName($fileName)
+    private function getFileName($fileName)
 	{
 		$fn = explode("/",$fileName);
 		return $fn[1];
 	}
+
+    function getConnection($node)
+    {
+        $xmlElement = $this->xml;
+        $connectionUsed = $this->getConnectionNameUsed($node);
+        $arr = array();
+        foreach($xmlElement->connection as $connection)
+        {
+            if(in_array($connection->name,$connectionUsed))
+                $arr[] = $this->xml2array($connection);
+        }
+		
+        return $arr;
+    }
+
+    private function getConnectionNameUsed($node)
+    {
+        $arr = array();
+        foreach($node as $data)
+        {
+            if(strcmp(strtoupper($data['type']),"SQL")==0)
+            {
+                $arr[] = $data['connection'];
+            }
+        }
+        return $arr;
+    }
 }
 
 

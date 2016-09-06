@@ -9,13 +9,13 @@ $(function () {
 			processData: false,
 			contentType: false,
 			type: 'post',
-			url: 'http://localhost/test/handleRequest.php',
+			url: 'http://localhost/graph-etl/handleRequest.php',
 			data: formData,
 			success: function (datas, status) {
 				scrollToDownBottomOfPage();
 				//console.log(datas);
 				var data = JSON.parse(datas);
-				
+				console.log(data);
 				//console.log(data.edge);
 				//console.log(data.node);
 				for (var key in data.node) {
@@ -84,7 +84,7 @@ $(function () {
 			// contentType: json,
 			dataType: 'json',
 			type: 'post',
-			url: 'http://localhost/test/handleRequest.php',
+			url: 'http://localhost/graph-etl/handleRequest.php',
 			data: {
 				'fileName': fileName
 			},

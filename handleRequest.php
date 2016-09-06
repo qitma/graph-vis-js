@@ -9,7 +9,9 @@
         $node = $xml->getNode();
         $edge = $xml->getEdge();
         $info = $xml->getInfo();
-        echo json_encode(array('node'=>$node,'edge'=>$edge,'info'=>$info,'ekstension'=>'kjb'));
+        $connection = $xml->getConnection($node);
+
+        echo json_encode(array('node'=>$node,'edge'=>$edge,'info'=>$info,'ekstension'=>$xml->getDir(),'connection'=>$connection));
         //error_log("masuk sini cek");
     }
   elseif(isset($_FILES['xml'])){
@@ -36,9 +38,9 @@
           $node = $xml->getNode();
           $edge = $xml->getEdge();
           $info = $xml->getInfo();
-         
+          $connection = $xml->getConnection($node);
 
-         echo json_encode(array('node'=>$node,'edge'=>$edge,'info'=>$info,'ekstension'=>$file_ext));
+         echo json_encode(array('node'=>$node,'edge'=>$edge,'info'=>$info,'ekstension'=>$file_ext,'connection'=>$connection));
       }else{
          print_r($errors);
       }
