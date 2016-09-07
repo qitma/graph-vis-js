@@ -55,3 +55,50 @@ body {
 .space-detail{
   padding:5px 0px 5px 10px;
 }
+
+select{
+    max-width:100px;
+}
+
+#tabs > li.active > a{
+    background: #fbfbfb;
+}
+
+.tab-content{
+    padding: 20px;
+    background-color: #fbfbfb;
+    border-left: #dddddd 1px solid;
+    border-right: #dddddd 1px solid;
+    border-bottom: #dddddd 1px solid;
+}
+
+.label-light{
+    background: #f0f0f0;
+    color:#b5b5b5;
+}
+
+#drop > li.active > a > span.label{
+    background: #4889c1;
+    color:#8dbae0;
+}
+
+.panel{
+    -webkit-border-top-left-radius: 0px;
+    -moz-border-top-left-radius: 0px;
+    border-top-left-radius: 0px;
+    -webkit-border-top-right-radius: 0px;
+    -moz-border-top-right-radius: 0px;
+    border-top-right-radius: 0px;
+    border-top: none;
+}
+
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+}
+
+.network{
+    height:500px;width:100%; border: 1px solid lightgray;
+}

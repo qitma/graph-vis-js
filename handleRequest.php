@@ -9,9 +9,15 @@
         $node = $xml->getNode();
         $edge = $xml->getEdge();
         $info = $xml->getInfo();
+        $slaveServer = $xml->getSlaveServer();
         $connection = $xml->getConnection($node);
 
-        echo json_encode(array('node'=>$node,'edge'=>$edge,'info'=>$info,'ekstension'=>$xml->getEkstension(),'connection'=>$connection));
+        echo json_encode(array('node'=>$node,
+                                'edge'=>$edge,
+                                'info'=>$info,
+                                'ekstension'=>$xml->getEkstension(),
+                                'connection'=>$connection,
+                                'slaveServer'=>$slaveServer));
         //error_log("masuk sini cek");
     }
   elseif(isset($_FILES['xml'])){
@@ -38,9 +44,15 @@
           $node = $xml->getNode();
           $edge = $xml->getEdge();
           $info = $xml->getInfo();
-         // $connection = $xml->getConnection($node);
+          $connection = $xml->getConnection($node);
+          $slaveServer = $xml->getSlaveServer();
 
-         echo json_encode(array('node'=>$node,'edge'=>$edge,'info'=>$info,'ekstension'=>$file_ext,'connection'=>$connection));
+         echo json_encode(array('node'=>$node,
+                                'edge'=>$edge,
+                                'info'=>$info,
+                                'ekstension'=>$file_ext,
+                                'slaveServer'=>$slaveServer,
+                                'connection'=>$connection));
       }else{
          print_r($errors);
       }

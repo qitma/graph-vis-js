@@ -93,12 +93,8 @@ class parseXML
             if(strcmp(strtoupper($arr[$i]['type']),"SQL")==0)
             {
                 $arr[$i]['connection'] = $this->getDetailConnection($arr[$i]['connection'],$connection);
-              
             }
-            //print_r($node);
         }
-
-           // print_r($arr);
         return $arr;
     }
 
@@ -116,6 +112,19 @@ class parseXML
 
         //print_r($arr);
         return $arr;
+    }
+
+    function getSlaveServer()
+    {
+        $xmlElement = $this->xml;
+        $arr = array();
+        foreach($xmlElement->slaveservers->slaveserver as $slave)
+        {
+            $arr[] = $this->xml2array($slave);
+        }
+
+        return $arr;
+
     }
 
     private function getFileName($fileName)
