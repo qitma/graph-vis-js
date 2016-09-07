@@ -435,6 +435,7 @@ function addDataDetail(data, count,idName) {
 	}//end foreach
 }
 
+/* fungsi untuk meremove element yg bersi data */
 function removeDetail(stacks) {
 	for (var key in stacks) {
 		console.log( stacks[key]);
