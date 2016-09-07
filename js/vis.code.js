@@ -409,12 +409,12 @@ function addDataDetail(data, count,idName) {
 			stack.push(key+count);
 			if (isObject(data[key])) {
 				$("#"+idName).append(
-					"<div><button id='collapse-"+key+count+"'class='space-detail btn  btn-default' type='button'"+
+					"<div><div id='collapse-"+key+count+"'class='space-detail btn  btn-default' type='button'"+
 					"data-toggle='collapse' data-target='#"+key+count+"'>"+
 					"<span data-toggle='tooltip' title='klik for detail'>"+
 					"<label>"+key+" &nbsp;</label>"+
 					"<i class='fa fa-caret-right'></i>"+
-					"</span></button></div>"+
+					"</span></div></div>"+
 					"<div id='"+key+count+"' class='box-gray collapse'></div>"
 					);
 			//	if (key.length > 2)

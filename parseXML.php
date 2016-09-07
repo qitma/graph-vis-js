@@ -131,10 +131,15 @@ class parseXML
         $xmlElement = $this->xml;
         $connectionUsed = $this->getConnectionNameUsed($node);
         $arr = array();
+        $i = 0;
         foreach($xmlElement->connection as $connection)
         {
             if(in_array($connection->name,$connectionUsed))
-                $arr[] = $this->xml2array($connection);
+            {
+                $arr[$i] = $this->xml2array($connection);
+                $arr[$i]['password'] = "**********";
+                $i++;
+            }
         }
 		
 
