@@ -396,25 +396,38 @@ function getOption() {
 	}
 } */
 
+
+/* parameter : addDataDetail
+* data : object berisi data detail
+* count : number untuk unique ID untuk setiap element
+* idName : berupa ID (attribute html) yang ingin disisipkan element
+*/
 function addDataDetail(data, count,idName) {
 	for (var key in data) {
 		if (data.hasOwnProperty(key)) {
 			if (key == "label") break;
+			stack.push(key+count);
 			if (isObject(data[key])) {
-				$("#"+idName).append("<div id='"+key+count+"' class='space-detail box-gray'></div>");
-				if (key.length > 2)
-					$("#"+key+count).append("<label>"+key+"</label>");
-				addDataDetail(data[key], 1,key+count);
+				$("#"+idName).append(
+					"<div><button id='collapse-"+key+count+"'class='space-detail btn  btn-default' type='button'"+
+					"data-toggle='collapse' data-target='#"+key+count+"'>"+
+					"<span data-toggle='tooltip' title='klik for detail'>"+
+					"<label>"+key+" &nbsp;</label>"+
+					"<i class='fa fa-caret-right'></i>"+
+					"</span></button></div>"+
+					"<div id='"+key+count+"' class='box-gray collapse'></div>"
+					);
+			//	if (key.length > 2)
+			//		$("#collapse"+key+count).append("<label>"+key+"</label>");
+				addDataDetail(data[key],count,key+count);
 			} else {
 				//var id = key + count;
-				stack.push("dataDetail"+count);
 				if ($("#dvName" + count).length == 0) {
 					$('#'+idName).append(
-						"<div id='dataDetail" + count + "'>" +
 						"<div class='space-pad' id='" + key + count + "'>" +
 						"<label>" + key + "</label>" +
 						"<div id='" + key + count + "' class='box-gray'>" + data[key] + "</div>" +
-						"</div></div>"
+						"</div>"
 					);
 				}
 			}
@@ -425,7 +438,6 @@ function addDataDetail(data, count,idName) {
 function removeDetail(stacks) {
 	for (var key in stacks) {
 		console.log( stacks[key]);
-		$("#" + stacks[key]).empty();
 		$("#" + stacks[key]).remove();
 		stacks[key] = null;
 	}

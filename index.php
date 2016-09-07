@@ -18,7 +18,9 @@
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <!--<script src="js/cytoscape.js"></script>
     <script src="js/code.js"></script> -->
-    <script src="js/vis.min.js"></script>
+    <script>
+    document.write('<script src="js/vis.min.js?dev='+Math.floor(Math.random()* 100)+'"\><\/script>');
+    </script>
     <script src="js/vis.code.js"></script>
      <style type="text/css">
         #mynetwork {
@@ -87,7 +89,6 @@
         </div>
         -->
         <div id="detail">
-        <div id="dataDetail1"></div>
         
         <div class="modal fade" id="myModal2">
             <div class="modal-dialog" style="width:70%;">
