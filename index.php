@@ -47,11 +47,15 @@
         <!-- edit tab -->
     <script id="tabTemp" type="text/x-jquery-tmpl"> 
         <div class='tab-pane' id='tab${index}'>
-            <span>Device ${index}</span>
             <div class="space-pad">
                 <label class col="">Graph</label>
                 <a href="#" class="btn btn-primary" id="fit-graph1" style="float:right">Fit graph</a>
                 <div id="mynetwork${index}" style="clear:both;margin-top:20px;" class="network"></div>
+                <div class="space-pad dvDetailGraph">
+                    <button class="btn-default btn-primary btn detailGraph" style="text-align:right">Detail Graph</button> &nbsp;
+                    <label class="fileName2"></label>
+                </div>
+                <div id="detail">
             </div>
         </div>
     </script>
@@ -108,32 +112,6 @@
         </div>
     </div> -->     
 <! -- end edit tab -->
-
-       <!-- <div class="space-pad" id="dvKTRsql">
-            <label>SQL</label>
-            <div id="KTRsql" class="box-gray"></div>
-        </div>
-        <div class="space-pad" id="dvKTRConnection">
-            <label>Connection</label>
-            <div id="KTRconnection" class="box-gray"></div>
-        </div> -->
-        <!--<div class="input-group space-pad" id="dvKJBType">
-            <span class="input-group-addon" id="basic-addon1">Type</span>
-            <input type="text" class="form-control" placeholder="Type" aria-describedby="basic-addon1" id="KJBtype">
-        </div>
-        <div class="input-group space-pad" id="dvKJBFileName">
-            <span class="input-group-addon" id="basic-addon1">File Name</span>
-            <input type="text" class="form-control" placeholder="File Name" aria-describedby="basic-addon1" id="KJBFileName">
-        </div>
-        <div class="input-group space-pad" id="dvKJBJobName">
-            <span class="input-group-addon" id="basic-addon1">Job Name</span>
-            <input type="text" class="form-control" placeholder="Job Name" aria-describedby="basic-addon1" id="KJBJobName">
-        </div>
-        <div class="input-group space-pad" id="dvKJBDirectory">
-            <span class="input-group-addon" id="basic-addon1">Directory</span>
-            <input type="text" class="form-control" placeholder="Directory" aria-describedby="basic-addon1" id="KJBDirectory">
-        </div>
-        -->
         
         <div class="modal fade" id="myModal2">
             <div class="modal-dialog" style="width:70%;">

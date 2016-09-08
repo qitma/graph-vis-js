@@ -1,14 +1,21 @@
 $(function () {
 	var network = null;
-	var idElement = 1; // id untuk setiap attribute ID agar unik
-	
+	var idElement = 1; // id untuk setiap attribute ID agar unikS
 	var maxTabs = 4, index = 1;
+	var state = true;
 	hideForm();
 	var stack = new Array();
 	var stackF = new Array();
 
 	if($('#toggle1').text()=="")
 		$('#toggle1').text("Nama File");
+	
+	/* $('.nav-tabs a').on('show.bs.tab', function(){
+        alert('The new tab is about to be shown.');
+    });
+   $('.nav-tabs a').on('shown.bs.tab', function(){
+        alert('The new tab is now fully shown.');
+    }); */
 
 	function getDataGraph(formData, container, flag) {
 		$.ajax({
@@ -21,7 +28,7 @@ $(function () {
 				scrollToDownBottomOfPage();
 				//console.log(datas);
 				var data = JSON.parse(datas);
-				var idLocal = idElement;
+				var idLocal = 1;
 				//console.log(data);
 				//console.log(data.edge);
 				//console.log(data.node);
@@ -57,26 +64,19 @@ $(function () {
 					var clickedNodes = dataGraph.nodes.get(ids);
 
 					var status = checkGraphIsExist(clickedNodes[0].filename)
-					$('#fileName' + idLocal).text(clickedNodes[0].filename_);
-					stackF.push('fileName'+idLocal);
+					$('#fileName1').text(clickedNodes[0].filename_);
+					//stackF.push('fileName'+idLocal);
+					console.log("id local : "+idLocal);
+					console.log("ids node:"+ids);
 					showFormDetailGraph(status, idLocal, clickedNodes[0], function () {
 						//scrollToDownBottomOfPage();
 					});
 
-					/*$('#KJBtype').val(clickedNodes[0].type);
-					$('#KJBFileName').val(clickedNodes[0].filename_);
-					$('#KJBDirectory').val(clickedNodes[0].directory);
-					$('#KJBJobName').val(clickedNodes[0].jobname);
-					$('#fileName').text(clickedNodes[0].filename_); */
-					/*if (status)
-						scrollToDown("dvKJBDirectory");
-					else
-						scrollToDown("mynetwork"); */
-
 				})
 				network.on("deselectNode", function (params) {
 					removeDetail(stack);
-					emptyDetail(stackF);
+					//emptyDetail(stackF);
+					hideForm();
 				})
 			}, // end success
 			error: function () {
@@ -130,14 +130,13 @@ $(function () {
 				var count = 0; // initial count for fit graph;
 				getXMlInfo(data.info, idLocal);
 				var dataGraph = drawGraph(data, container);
+				$('.li-tab-toggle:last a').tab('show'); // show last tab
 				network.on("selectNode", function (params) {
 					var ids = params.nodes;
 					var clickedNodes = dataGraph.nodes.get(ids);
-
 					var status = checkGraphIsExist(clickedNodes[0].filename)
 					$('#fileName' + idLocal).text(clickedNodes[0].filename_)
-					console.log($('#fileName').text());
-					showFormDetailGraph(status, idLocal,clickedNodes[0], function () {
+					showFormDetailGraph(status, ids,clickedNodes[0], function () {
 						//scrollToDownBottomOfPage();
 					});
 				})
@@ -151,11 +150,16 @@ $(function () {
 
 					count = 1;
 				})
+				state = true;
 			}, // end success
 			error: function () {
 				alert("File " + fileName + " tidak ada");
 				network = new vis.Network(container);
 				network.destroy();
+				state = false;
+				//$('#tabs li:last').remove(); // menghilangkan tab
+				//$('#tab'+index).remove(); // menghilangkan content dari tab
+				console.log('#tab'+idElement);
 			}
 		});
 
@@ -180,12 +184,11 @@ $(function () {
 		console.log(idElement);
 	});
 
-	$('#detailGraph' + idElement).click(function (e) {
+	$('.tab-pane.active > #dvDetailGraph1 > #detailGraph1').click(function (e) {
 		e.preventDefault();
 		idElement += 1;
-		console.log(idElement);
-		addTab(idElement,getDetailGraph);
-
+		var filename = $('#fileName1').text();
+		addTab(idElement,filename,getDetailGraph);
 	})
 
 	function decrementIdElement(id) {
@@ -260,26 +263,16 @@ $(function () {
 	}
 
 	function showFormDetailGraph(status, id, data, callback) {
-		/*$('#dvKJBName').toggle(status) // form untuk KJB
-		$('#dvKJBType').toggle(status); // form untuk KJB
-		$('#dvKJBFileName').toggle(status); // form untuk KJB
-		$('#dvKJBJobName').toggle(status); // form untuk KJB
-		$('#dvKJBDirectory').toggle(status); // form untuk KJB */
-		$('#dvDetailGraph' + id).toggle(status); // form untuk KJB 
-		console.log(id);
 		addDataDetail(data, id, "detail");
 		callback();
 	}
 	
 	function hideForm() {
-	/*	$('#dvKTRsql').hide(); //form untuk info KTR,default
-		$('#dvKTRConnection').hide(); //form untuk info KTR,default
-		$('#dvKJBName').hide() // form untuk KJB
-		$('#dvKJBType').hide(); // form untuk KJB
-		$('#dvKJBFileName').hide(); // form untuk KJB
-		$('#dvKJBJobName').hide(); // form untuk KJB
-		$('#dvKJBDirectory').hide(); // form untuk KJB */
 		$('#dvDetailGraph1').hide();
+	}
+
+	function hideForm2(){
+		$('.dvDetailGraph').hide();
 	} 
 
 	//check data graph is exist or not in one node ,this function be called everytime u need to show detailGraph
@@ -467,23 +460,20 @@ $(function () {
 	}
 
 /* start function for tab */
-	function addTab(index,callback) {
-		var flag = true;
-		var indexFn = index -1;
-		//console.log('#fileName'+index);
-		var filename = $('#fileName' + indexFn).text();
-		//console.log(filename);
+	function addTab(index,filename,callback) {
+		var flag = true; // belum guna
+		var filename2 = filename.split(".");
 		//index++;
 		var name = "tab" + index;
 		if ($('#' + name).length == 0) {
 
 			$.tmpl(navTemp, { "index": index, fileName: filename }).insertAfter('.li-tab-toggle:last');
-			$.tmpl(tabTemp, { "index": index }).appendTo('.tab-content');
-			$('.li-tab-toggle:last a').tab('show');
+			$.tmpl(tabTemp, { "index": index, fileName: filename2[0] }).appendTo('.tab-content');
 			var container = document.getElementById('mynetwork'+index);
 			updateTabs();
 			console.log(container);
 			callback(filename,container,flag);
+
 		} else {
 			console.log("gagal");
 		}
@@ -494,18 +484,19 @@ $(function () {
 		var tabs = $('.li-tab-toggle').length,
 			nav = $('.li-tab-toggle.active');
 
-		nav.parent('#tabs').find('#drop li:first').insertBefore('#tabs .dropdown');
+		//nav.parent('#tabs').find('#drop li:first').insertBefore('#tabs .dropdown');
 
 		var check = nav.children('a');
-
+		$(this).parents('li').remove();
+		$(tabID).remove();
 		if (check.is('[href="' + tabID + '"]') == true) {
 			$('#tabs a:first').tab('show');
+			//alert("test sini");
 			//$('a', nav.is('li:last') ? nav.prev() : nav.next()).tab('show');
 		} else {
 			$('a', nav).tab('show');
 		}
-		$(this).parents('li').remove();
-		$(tabID).remove();
+		
 
 		updateTabs();
 	});
