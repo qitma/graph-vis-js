@@ -130,7 +130,7 @@ $(function () {
 					//showForm(ekstensionKTR);
 				}
 				var count = 0; // initial count for fit graph;
-				getXMlInfoTabActive(data.info, uniqueID);
+				getXMlInfoTabActive(data.info,trimString(uniqueID[0]).trim());
 				var dataGraph = drawGraph(data, container);
 				$('.li-tab-toggle:last a').tab('show'); // show last tab
 				network.on("selectNode", function (params) {
@@ -138,7 +138,7 @@ $(function () {
 					var clickedNodes = dataGraph.nodes.get(ids);
 					var status = checkGraphIsExist(clickedNodes[0].filename);
 					$('.tab-pane.active > .dvDetailGraph > .fileName').text(clickedNodes[0].filename_)
-					showFormDetailGraphActiveTab(status, uniqueID[0],clickedNodes[0], function () {
+					showFormDetailGraphActiveTab(status, trimString(uniqueID[0]).trim(),clickedNodes[0], function () {
 						//scrollToDownBottomOfPage();
 					});
 				})
@@ -188,24 +188,25 @@ $(function () {
 
 	$('#detailGraph1').click(function (e) {
 		e.preventDefault();
+		var cek = "hai aku qitma";
+		console.log(trimString(cek));
 		//idElement += 1;
 		var filename = $('#fileName1').text();
 		var uniqID = filename.split('.');
-		console.log(filename);
-		addTab(uniqID[0],filename,getDetailGraph); // filename pada parameter pertama dijadikan unique ID untuk postfix
+		console.log("detailGraph1");
+		console.log(uniqID[0].trim());
+		addTab(trimString(uniqID[0]),filename,getDetailGraph); // filename pada parameter pertama dijadikan unique ID untuk postfix
 	})
 
 	$(document).on('click',".tab-pane.active > .dvDetailGraph > .detailGraph", function(e) {
 		e.preventDefault();
-		console.log("wololo");
 		//idElement += 1;
 		var filename = $(this).siblings('.fileName').text();
 		var uniqID = filename.split('.');
-		console.log("filename : "+filename+" uniq : "+uniqID[0]);
-		addTab(uniqID[0],filename,getDetailGraph); // filename pada parameter pertama dijadikan unique ID untuk postfix
+		addTab(trimString(uniqID[0]),filename,getDetailGraph); // filename pada parameter pertama dijadikan unique ID untuk postfix
 	})
 
-	$("#fit-graph").click(function (e) {
+	$(document).on('click',".tab-pane.active > .graph > .fit-graph", function(e) {
 		fitGraph();
 	})
 
@@ -215,6 +216,13 @@ $(function () {
 
 	function decrementIdElement(id) {
 		id -= 1;
+	}
+
+	function trimString(str)
+	{
+		var string = str.replace(/\s+/g, '');
+
+		return string;
 	}
 
 
@@ -293,6 +301,7 @@ $(function () {
 	function showFormDetailGraph(status, id, data, callback) {
 		$('#dvDetailGraph1').toggle(status);
 		var flag = 1; // flag input ID
+		console.log("show form detail graph :"+id);
 		addDataDetail(data, id, "detail",flag);
 		callback();
 	}
@@ -452,7 +461,8 @@ $(function () {
 				if (key == "label") break;
 				stack.push(key + count);
 				if (isObject(data[key])) {
-					$(newSelector).append(
+					if(!jQuery.isEmptyObject(data[key])){
+						$(newSelector).append(
 						"<div><div id='collapse-" + key + count + "'class='space-detail btn  btn-default' type='button'" +
 						"data-toggle='collapse' data-target='#" + key + count + "'>" +
 						"<span data-toggle='tooltip' title='klik for detail'>" +
@@ -460,10 +470,11 @@ $(function () {
 						"<i class='fa fa-caret-right'></i>" +
 						"</span></div></div>" +
 						"<div id='" + key + count + "' class='box-gray collapse'></div>"
-					);
-					//	if (key.length > 2)
-					//		$("#collapse"+key+count).append("<label>"+key+"</label>");
-					addDataDetail(data[key], count, key + count,1); // flag 1 karena akan di append pada ID
+						);
+						//	if (key.length > 2)
+						//		$("#collapse"+key+count).append("<label>"+key+"</label>");
+						addDataDetail(data[key], count, key + count,1); // flag 1 karena akan di append pada ID
+					}
 				} else {
 					//var id = key + count;
 					if ($("#dvName" + count).length == 0) {

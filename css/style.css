@@ -60,6 +60,10 @@ select{
     max-width:100px;
 }
 
+#tabs > li > a{
+    background:#f0f0f0;
+}
+
 #tabs > li.active > a{
     background: #fbfbfb;
 }

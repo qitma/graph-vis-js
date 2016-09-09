@@ -59,9 +59,9 @@
                 <span class="input-group-addon" id="basic-addon1">Job Description</span>
                 <input type="text" class="form-control" placeholder="File Job Name" aria-describedby="basic-addon1" id="xml_desc${index}">
             </div>
-            <div class="space-pad">
+            <div class="space-pad graph">
                 <label class col="">Graph</label>
-                <!-- <a href="#" class="btn btn-primary" id="fit-graph1" style="float:right">Fit graph</a> -->
+                <a href="#" class="btn btn-primary fit-graph" style="float:right">Fit graph</a>
             </div>
             <div id="mynetwork${index}" style="clear:both;margin-top:20px;" class="network"></div>
             <div class="space-pad dvDetailGraph">
