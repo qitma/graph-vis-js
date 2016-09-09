@@ -47,16 +47,28 @@
         <!-- edit tab -->
     <script id="tabTemp" type="text/x-jquery-tmpl"> 
         <div class='tab-pane' id='tab${index}'>
+            <div class="input-group space-pad">
+                <span class="input-group-addon" id="basic-addon1">File Job Name</span>
+                <input type="text" class="form-control" placeholder="Job Name" aria-describedby="basic-addon1" id="xml_name${index}">
+            </div>
+            <div class="input-group space-pad">
+                <span class="input-group-addon" id="basic-addon1">Job Directory</span>
+                <input type="text" class="form-control" placeholder="File Job Name" aria-describedby="basic-addon1" id="xml_dir${index}">
+            </div>
+            <div class="input-group space-pad">
+                <span class="input-group-addon" id="basic-addon1">Job Description</span>
+                <input type="text" class="form-control" placeholder="File Job Name" aria-describedby="basic-addon1" id="xml_desc${index}">
+            </div>
             <div class="space-pad">
                 <label class col="">Graph</label>
-                <a href="#" class="btn btn-primary" id="fit-graph1" style="float:right">Fit graph</a>
-                <div id="mynetwork${index}" style="clear:both;margin-top:20px;" class="network"></div>
-                <div class="space-pad dvDetailGraph">
-                    <button class="btn-default btn-primary btn detailGraph" style="text-align:right">Detail Graph</button> &nbsp;
-                    <label class="fileName2"></label>
-                </div>
-                <div id="detail">
+                <!-- <a href="#" class="btn btn-primary" id="fit-graph1" style="float:right">Fit graph</a> -->
             </div>
+            <div id="mynetwork${index}" style="clear:both;margin-top:20px;" class="network"></div>
+            <div class="space-pad dvDetailGraph">
+                <button class="btn-default btn-primary btn detailGraph" style="text-align:right">Detail Graph</button> &nbsp;
+                <label class="fileName"></label>
+            </div>
+            <div id="detail${index}"></div>
         </div>
     </script>
     <script id="navTemp" type="text/x-jquery-tmpl"> 
@@ -98,7 +110,7 @@
                 <button class="btn-default btn-primary btn" id="detailGraph1" style="text-align:right">Detail Graph</button> &nbsp;
                 <label id="fileName1"></label>
             </div>
-            <div id="detail">
+            <div id="detail"></div>
         </div>
     </div>
     

@@ -85,9 +85,10 @@ $(function () {
 		});
 	}
 
-	function getDetailGraph(fileName, container, flag) {
+	function getDetailGraph(fileName, container, flag,index) {
 
 		$('.modal-title').text(fileName);
+		$('#tab'+index).find('.dvDetailGraph').hide();
 		$.ajax({
 			// processData: false,
 			// contentType: json,
@@ -100,20 +101,21 @@ $(function () {
 			success: function (data, status) {
 				//showModal(idElement);
 				//var data = JSON.parse(datas);
-				var idLocal = idElement;
+				var uniqueID = fileName.split('.');
+				var idLocal = index;
 				for (var key in data.node) {
 					if (!data.node.hasOwnProperty(key)) continue;
 					data.node[key]['label'] = data.node[key]['name'];
 					data.node[key]['id'] = data.node[key]['name'];
 					if (data.ekstension.localeCompare("kjb") == 0) {
 						if (data.node[key].hasOwnProperty('filename')) {
-							var fileName = data.node[key]['filename'].split("/");
-							data.node[key]['filename_'] = fileName[1];
+							var fileName1 = data.node[key]['filename'].split("/");
+							data.node[key]['filename_'] = fileName1[1];
 						}
 						data.node[key]['x'] = data.node[key].xloc;
 						data.node[key]['y'] = data.node[key].yloc;
 					} else {
-						console.log("masuk else");
+						//console.log("masuk else");
 						data.node[key]['x'] = data.node[key]['GUI'].xloc;
 						data.node[key]['y'] = data.node[key]['GUI'].yloc;
 					}
@@ -128,15 +130,15 @@ $(function () {
 					//showForm(ekstensionKTR);
 				}
 				var count = 0; // initial count for fit graph;
-				getXMlInfo(data.info, idLocal);
+				getXMlInfoTabActive(data.info, uniqueID);
 				var dataGraph = drawGraph(data, container);
 				$('.li-tab-toggle:last a').tab('show'); // show last tab
 				network.on("selectNode", function (params) {
 					var ids = params.nodes;
 					var clickedNodes = dataGraph.nodes.get(ids);
-					var status = checkGraphIsExist(clickedNodes[0].filename)
-					$('#fileName' + idLocal).text(clickedNodes[0].filename_)
-					showFormDetailGraph(status, ids,clickedNodes[0], function () {
+					var status = checkGraphIsExist(clickedNodes[0].filename);
+					$('.tab-pane.active > .dvDetailGraph > .fileName').text(clickedNodes[0].filename_)
+					showFormDetailGraphActiveTab(status, uniqueID[0],clickedNodes[0], function () {
 						//scrollToDownBottomOfPage();
 					});
 				})
@@ -184,11 +186,31 @@ $(function () {
 		console.log(idElement);
 	});
 
-	$('.tab-pane.active > #dvDetailGraph1 > #detailGraph1').click(function (e) {
+	$('#detailGraph1').click(function (e) {
 		e.preventDefault();
-		idElement += 1;
+		//idElement += 1;
 		var filename = $('#fileName1').text();
-		addTab(idElement,filename,getDetailGraph);
+		var uniqID = filename.split('.');
+		console.log(filename);
+		addTab(uniqID[0],filename,getDetailGraph); // filename pada parameter pertama dijadikan unique ID untuk postfix
+	})
+
+	$(document).on('click',".tab-pane.active > .dvDetailGraph > .detailGraph", function(e) {
+		e.preventDefault();
+		console.log("wololo");
+		//idElement += 1;
+		var filename = $(this).siblings('.fileName').text();
+		var uniqID = filename.split('.');
+		console.log("filename : "+filename+" uniq : "+uniqID[0]);
+		addTab(uniqID[0],filename,getDetailGraph); // filename pada parameter pertama dijadikan unique ID untuk postfix
+	})
+
+	$("#fit-graph").click(function (e) {
+		fitGraph();
+	})
+
+	$("#fit-graph1").click(function (e) {
+		fitGraph();
 	})
 
 	function decrementIdElement(id) {
@@ -251,6 +273,12 @@ $(function () {
 		$('#xml_dir' + count).val(data.directory);
 	}
 
+	function getXMlInfoTabActive(data, id) {
+		$('#xml_name' + id).val(data.name);
+		$('#xml_desc' + id).val(data.description);
+		$('#xml_dir' + id).val(data.directory);
+	}
+
 	function showForm(status) {
 		$('#dvKTRsql').toggle(status); //form untuk info KTR,default
 		$('#dvKTRConnection').toggle(status); //form untuk info KTR,default
@@ -263,7 +291,19 @@ $(function () {
 	}
 
 	function showFormDetailGraph(status, id, data, callback) {
-		addDataDetail(data, id, "detail");
+		$('#dvDetailGraph1').toggle(status);
+		var flag = 1; // flag input ID
+		addDataDetail(data, id, "detail",flag);
+		callback();
+	}
+
+	function showFormDetailGraphActiveTab(status, id, data, callback) {
+		$('.tab-pane.active > .dvDetailGraph').toggle(status);
+		console.log("status nya: "+status);
+		console.log("id di show FormDetailGraphActiveTab:"+id);
+		var flag = 1; //flag input class
+		console.log("detail"+id);
+		addDataDetail(data, id, "detail"+id,flag);
 		callback();
 	}
 	
@@ -295,14 +335,6 @@ $(function () {
 			scrollTop: $(document).height() - $(window).height()
 		}, 1000);
 	}
-
-	$("#fit-graph").click(function (e) {
-		fitGraph();
-	})
-
-	$("#fit-graph1").click(function (e) {
-		fitGraph();
-	})
 
 	//set graph to fit with canvas
 	function fitGraph() {
@@ -402,16 +434,25 @@ $(function () {
 
 	/* parameter : addDataDetail
 	* data : object berisi data detail
-	* count : number untuk unique ID untuk setiap element
+	* count : postfix untuk unique ID untuk setiap element
 	* idName : berupa ID (attribute html) yang ingin disisipkan element
+	* flag : berupa tanda untuk menentukan selector berupa class atau ID 1 = ID ; 0 = class
 	*/
-	function addDataDetail(data, count, idName) {
+	function addDataDetail(data, count, selector,flag) {
+		console.log("selector :"+selector+" flag:"+flag);
+		var newSelector;
+		if(flag == 1)
+			newSelector  = "#"+selector;
+		else if(flag == 0)
+			newSelector = selector;
+		
+		console.log("new selector : "+newSelector);
 		for (var key in data) {
 			if (data.hasOwnProperty(key)) {
 				if (key == "label") break;
 				stack.push(key + count);
 				if (isObject(data[key])) {
-					$("#" + idName).append(
+					$(newSelector).append(
 						"<div><div id='collapse-" + key + count + "'class='space-detail btn  btn-default' type='button'" +
 						"data-toggle='collapse' data-target='#" + key + count + "'>" +
 						"<span data-toggle='tooltip' title='klik for detail'>" +
@@ -422,11 +463,12 @@ $(function () {
 					);
 					//	if (key.length > 2)
 					//		$("#collapse"+key+count).append("<label>"+key+"</label>");
-					addDataDetail(data[key], count, key + count);
+					addDataDetail(data[key], count, key + count,1); // flag 1 karena akan di append pada ID
 				} else {
 					//var id = key + count;
 					if ($("#dvName" + count).length == 0) {
-						$('#' + idName).append(
+						console.log("masuk sini");
+						$(newSelector).append(
 							"<div class='space-pad' id='" + key + count + "'>" +
 							"<label>" + key + "</label>" +
 							"<div id='" + key + count + "' class='box-gray'>" + data[key] + "</div>" +
@@ -466,14 +508,11 @@ $(function () {
 		//index++;
 		var name = "tab" + index;
 		if ($('#' + name).length == 0) {
-
 			$.tmpl(navTemp, { "index": index, fileName: filename }).insertAfter('.li-tab-toggle:last');
 			$.tmpl(tabTemp, { "index": index, fileName: filename2[0] }).appendTo('.tab-content');
 			var container = document.getElementById('mynetwork'+index);
 			updateTabs();
-			console.log(container);
-			callback(filename,container,flag);
-
+			callback(filename,container,flag,index);
 		} else {
 			console.log("gagal");
 		}
