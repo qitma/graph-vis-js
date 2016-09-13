@@ -1,5 +1,5 @@
 $(function () {
-	var network = null;
+	var network = new Array();
 	var idElement = 1; // id untuk setiap attribute ID agar unikS
 	var maxTabs = 4, index = 1;
 	var state = true;
@@ -7,15 +7,47 @@ $(function () {
 	var stack = new Array();
 	var stackF = new Array();
 
-	if($('#toggle1').text()=="")
+	if ($('#toggle1').text() == "")
 		$('#toggle1').text("Nama File");
-	
-	/* $('.nav-tabs a').on('show.bs.tab', function(){
-        alert('The new tab is about to be shown.');
-    });
-   $('.nav-tabs a').on('shown.bs.tab', function(){
-        alert('The new tab is now fully shown.');
-    }); */
+
+	$('#upload').submit(function (e) {
+		/*this function e.pereventDefault be used for prevent any distraction from another function
+		* like function called another php file.
+		*/
+		e.preventDefault();
+		var formData = new FormData(this);
+		var container = document.getElementById('mynetwork');
+		var flag = false;
+		$('[id^=dataDetail]').remove();
+		getDataGraph(formData, container, flag);
+
+	});
+
+	$('#detailGraph1').click(function (e) {
+		e.preventDefault();
+		//idElement += 1;
+		var filename = $('#fileName1').text();
+		var uniqID = replaceDotString(trimString(filename));
+		addTab(uniqID, filename, getDetailGraph); // filename pada parameter pertama dijadikan unique ID untuk postfix
+	})
+
+	$(document).on('click', ".tab-pane.active > .dvDetailGraph > .detailGraph", function (e) {
+		e.preventDefault();
+		var filename = $(this).siblings('.fileName').text();
+		var uniqID = replaceDotString(trimString(filename));
+		addTab(uniqID, filename, getDetailGraph); // filename pada parameter pertama dijadikan unique ID untuk postfix
+	})
+
+	$(document).on('click', ".tab-pane.active > .graph > .fit-graph", function (e) {
+		var str = $('.li-tab-toggle.active > a').text();
+		var strRemovedSpace = replaceDotString(trimString(str));
+		var strSub = strRemovedSpace.substring(0,strRemovedSpace.length-1);
+		fitGraph(strSub);
+	})
+
+	$("#fit-graph1").click(function (e) {
+		fitGraph($('#toggle1').text());
+	})
 
 	function getDataGraph(formData, container, flag) {
 		$.ajax({
@@ -48,6 +80,7 @@ $(function () {
 						data.node[key]['y'] = data.node[key]['GUI'].yloc;
 					}
 				}
+				var uniqueID = replaceDotString(trimString(data.info.name));
 				var ekstensionKTR = false;//default
 				var info;
 				if (data.ekstension.localeCompare("ktr") == 0) {
@@ -58,22 +91,20 @@ $(function () {
 					//showForm(ekstensionKTR);
 				}
 				getXMlInfo(data.info, idLocal);
-				var dataGraph = drawGraph(data, container);
-				network.on("selectNode", function (params) {
+				var dataGraph = drawGraph(data, container,uniqueID);
+				network[uniqueID].on("selectNode", function (params) {
 					var ids = params.nodes;
 					var clickedNodes = dataGraph.nodes.get(ids);
 
 					var status = checkGraphIsExist(clickedNodes[0].filename)
 					$('#fileName1').text(clickedNodes[0].filename_);
 					//stackF.push('fileName'+idLocal);
-					console.log("id local : "+idLocal);
-					console.log("ids node:"+ids);
 					showFormDetailGraph(status, idLocal, clickedNodes[0], function () {
 						//scrollToDownBottomOfPage();
 					});
 
 				})
-				network.on("deselectNode", function (params) {
+				network[uniqueID].on("deselectNode", function (params) {
 					removeDetail(stack);
 					//emptyDetail(stackF);
 					hideForm();
@@ -85,10 +116,10 @@ $(function () {
 		});
 	}
 
-	function getDetailGraph(fileName, container, flag,index) {
+	function getDetailGraph(fileName, container, flag, index) {
 
 		$('.modal-title').text(fileName);
-		$('#tab'+index).find('.dvDetailGraph').hide();
+		$('#tab' + index).find('.dvDetailGraph').hide();
 		$.ajax({
 			// processData: false,
 			// contentType: json,
@@ -101,7 +132,7 @@ $(function () {
 			success: function (data, status) {
 				//showModal(idElement);
 				//var data = JSON.parse(datas);
-				var uniqueID = fileName.split('.');
+				var uniqueID = replaceDotString(trimString(fileName));
 				var idLocal = index;
 				for (var key in data.node) {
 					if (!data.node.hasOwnProperty(key)) continue;
@@ -130,25 +161,25 @@ $(function () {
 					//showForm(ekstensionKTR);
 				}
 				var count = 0; // initial count for fit graph;
-				getXMlInfoTabActive(data.info,trimString(uniqueID[0]).trim());
-				var dataGraph = drawGraph(data, container);
+				getXMlInfoTabActive(data.info, uniqueID);
+				var dataGraph = drawGraph(data, container,uniqueID);
 				$('.li-tab-toggle:last a').tab('show'); // show last tab
-				network.on("selectNode", function (params) {
+				network[uniqueID].on("selectNode", function (params) {
 					var ids = params.nodes;
 					var clickedNodes = dataGraph.nodes.get(ids);
 					var status = checkGraphIsExist(clickedNodes[0].filename);
 					$('.tab-pane.active > .dvDetailGraph > .fileName').text(clickedNodes[0].filename_)
-					showFormDetailGraphActiveTab(status, trimString(uniqueID[0]).trim(),clickedNodes[0], function () {
+					showFormDetailGraphActiveTab(status, uniqueID, clickedNodes[0], function () {
 						//scrollToDownBottomOfPage();
 					});
 				})
-				network.on("deselectNode", function (params) {
+				network[uniqueID].on("deselectNode", function (params) {
 					removeDetail(stack);
 				})
 				//this function be used for make detail graph fit to canvas,because at initialize detail graph ,this graph has zoomed
-				network.on("afterDrawing", function (ex) {
+				network[uniqueID].on("afterDrawing", function (ex) {
 					if (count == 0)
-						fitGraph();
+						network[uniqueID].fit();
 
 					count = 1;
 				})
@@ -156,71 +187,24 @@ $(function () {
 			}, // end success
 			error: function () {
 				alert("File " + fileName + " tidak ada");
-				network = new vis.Network(container);
-				network.destroy();
+				network[uniqueID] = new vis.Network(container);
+				network[uniqueID].destroy();
 				state = false;
 				//$('#tabs li:last').remove(); // menghilangkan tab
 				//$('#tab'+index).remove(); // menghilangkan content dari tab
-				console.log('#tab'+idElement);
 			}
 		});
 
 	}
 
-	$('#upload').submit(function (e) {
-		/*this function e.pereventDefault be used for prevent any distraction from another function
-		* like function called another php file.
-		*/
-		e.preventDefault();
-		var formData = new FormData(this);
-		var container = document.getElementById('mynetwork');
-		var flag = false;
-		$('[id^=dataDetail]').remove();
-		getDataGraph(formData, container, flag);
+	function trimString(str) {
+		var string = str.replace(/\s+/g, '');
 
-	});
-
-	$("#myModal" + idElement).on("hidden.bs.modal", function () {
-		console.log("close modal");
-		decrementIdElement(idElement);
-		console.log(idElement);
-	});
-
-	$('#detailGraph1').click(function (e) {
-		e.preventDefault();
-		var cek = "hai aku qitma";
-		console.log(trimString(cek));
-		//idElement += 1;
-		var filename = $('#fileName1').text();
-		var uniqID = filename.split('.');
-		console.log("detailGraph1");
-		console.log(uniqID[0].trim());
-		addTab(trimString(uniqID[0]),filename,getDetailGraph); // filename pada parameter pertama dijadikan unique ID untuk postfix
-	})
-
-	$(document).on('click',".tab-pane.active > .dvDetailGraph > .detailGraph", function(e) {
-		e.preventDefault();
-		//idElement += 1;
-		var filename = $(this).siblings('.fileName').text();
-		var uniqID = filename.split('.');
-		addTab(trimString(uniqID[0]),filename,getDetailGraph); // filename pada parameter pertama dijadikan unique ID untuk postfix
-	})
-
-	$(document).on('click',".tab-pane.active > .graph > .fit-graph", function(e) {
-		fitGraph();
-	})
-
-	$("#fit-graph1").click(function (e) {
-		fitGraph();
-	})
-
-	function decrementIdElement(id) {
-		id -= 1;
+		return string;
 	}
 
-	function trimString(str)
-	{
-		var string = str.replace(/\s+/g, '');
+	function replaceDotString(str) {
+		var string = str.replace(/\./g, '_');
 
 		return string;
 	}
@@ -251,7 +235,7 @@ $(function () {
 		return obj;
 	}
 
-	function drawGraph(data, container) {
+	function drawGraph(data, container,uniqueID) {
 
 		data.node = makeTitleNode(data.node);
 		validateEdge(data.edge);
@@ -268,14 +252,12 @@ $(function () {
 		};
 
 		// initialize your network!
-		network = new vis.Network(container, buildGraph, getOption());
-		console.log("drawgraph"+idElement);
-		console.log(container);
+		network[uniqueID] = new vis.Network(container, buildGraph, getOption());
 		return buildGraph
 	}
 
 	function getXMlInfo(data, count) {
-		$('#toggle'+count).text(data.name);
+		$('#toggle' + count).text(data.name);
 		$('#xml_name' + count).val(data.name);
 		$('#xml_desc' + count).val(data.description);
 		$('#xml_dir' + count).val(data.directory);
@@ -292,37 +274,27 @@ $(function () {
 		$('#dvKTRConnection').toggle(status); //form untuk info KTR,default
 	}
 
-	function showModal(count) {
-		$('#myModal' + count).modal({
-			show: true
-		});
-	}
-
 	function showFormDetailGraph(status, id, data, callback) {
 		$('#dvDetailGraph1').toggle(status);
 		var flag = 1; // flag input ID
-		console.log("show form detail graph :"+id);
-		addDataDetail(data, id, "detail",flag);
+		addDataDetail(data, id, "detail", flag);
 		callback();
 	}
 
 	function showFormDetailGraphActiveTab(status, id, data, callback) {
 		$('.tab-pane.active > .dvDetailGraph').toggle(status);
-		console.log("status nya: "+status);
-		console.log("id di show FormDetailGraphActiveTab:"+id);
 		var flag = 1; //flag input class
-		console.log("detail"+id);
-		addDataDetail(data, id, "detail"+id,flag);
+		addDataDetail(data, id, "detail" + id, flag);
 		callback();
 	}
-	
+
 	function hideForm() {
 		$('#dvDetailGraph1').hide();
 	}
 
-	function hideForm2(){
+	function hideForm2() {
 		$('.dvDetailGraph').hide();
-	} 
+	}
 
 	//check data graph is exist or not in one node ,this function be called everytime u need to show detailGraph
 	function checkGraphIsExist(data) {
@@ -346,9 +318,9 @@ $(function () {
 	}
 
 	//set graph to fit with canvas
-	function fitGraph() {
-		if (network != null)
-			network.fit();
+	function fitGraph(uniqueID) {
+		if (network[uniqueID] != null)
+			network[uniqueID].fit();
 	}
 
 	//make tooltip for node
@@ -398,48 +370,6 @@ $(function () {
 		return options;
 	}
 
-	/*function addDataInfo(count) {
-		if ($('#xml_name' + count).length == 0) {
-			$('#dataInfo' + count).append(
-				"<div class='input-group space-pad'>" +
-				"<span class='input-group-addon' id='basic-addon1'>File Job Name</span>" +
-				"<input type='text' class='form-control' placeholder='Job Name' aria-describedby='basic-addon1' id='xml_name" + count + "'>" +
-				"</div>" +
-				"<div class='input-group space-pad'>" +
-				"<span class='input-group-addon' id='basic-addon1'>Job Directory</span>" +
-				"<input type='text' class='form-control' placeholder='File Job Name' aria-describedby='basic-addon1' id='xml_dir" + count + "'>" +
-				"</div>" +
-				"<div class='input-group space-pad'>" +
-				"<span class='input-group-addon' id='basic-addon1'>Job Description</span>" +
-				"<input type='text' class='form-control' placeholder='File Job Name' aria-describedby='basic-addon1' id='xml_desc" + count + "'>" +
-				"</div>"
-			);
-		}
-	} */
-
-	/*function addDataDetail(count) {
-		if ($("#dvKJBType" + count).length == 0) {
-			$('#dataDetail' + count).append(
-				"<div class='input-group space-pad' id='dvKJBType" + count + "'>" +
-				"<span class='input-group-addon' id='basic-addon1'>Type</span>" +
-				"<input type='text' class='form-control' placeholder='Type' aria-describedby='basic-addon1' id='KJBtype" + count + "'>" +
-				"</div>" +
-				"<div class='input-group space-pad' id='dvKJBFileName" + count + "'>" +
-				"<span class='input-group-addon' id='basic-addon1'>File Name</span>" +
-				"<input type='text' class='form-control' placeholder='File Name' aria-describedby='basic-addon1' id='KJBFileName" + count + "'>" +
-				"</div>" +
-				"<div class='input-group space-pad' id='dvKJBJobName" + count + "'>" +
-				"<span class='input-group-addon' id='basic-addon1'>Job Name</span>" +
-				"<input type='text' class='form-control' placeholder='Job Name' aria-describedby='basic-addon1' id='KJBJobName" + count + "'>" +
-				"</div>" +
-				"<div class='input-group space-pad' id='dvKJBDirectory" + count + "'>" +
-				"<span class='input-group-addon' id='basic-addon1'>Directory</span>" +
-				"<input type='text' class='form-control' placeholder='Directory' aria-describedby='basic-addon1' id='KJBDirectory" + count + "'>" +
-				"</div>"
-			);
-		}
-	} */
-
 
 	/* parameter : addDataDetail
 	* data : object berisi data detail
@@ -447,38 +377,35 @@ $(function () {
 	* idName : berupa ID (attribute html) yang ingin disisipkan element
 	* flag : berupa tanda untuk menentukan selector berupa class atau ID 1 = ID ; 0 = class
 	*/
-	function addDataDetail(data, count, selector,flag) {
-		console.log("selector :"+selector+" flag:"+flag);
+	function addDataDetail(data, count, selector, flag) {
 		var newSelector;
-		if(flag == 1)
-			newSelector  = "#"+selector;
-		else if(flag == 0)
+		if (flag == 1)
+			newSelector = "#" + selector;
+		else if (flag == 0)
 			newSelector = selector;
-		
-		console.log("new selector : "+newSelector);
+
 		for (var key in data) {
 			if (data.hasOwnProperty(key)) {
 				if (key == "label") break;
 				stack.push(key + count);
 				if (isObject(data[key])) {
-					if(!jQuery.isEmptyObject(data[key])){
+					if (!jQuery.isEmptyObject(data[key])) {
 						$(newSelector).append(
-						"<div><div id='collapse-" + key + count + "'class='space-detail btn  btn-default' type='button'" +
-						"data-toggle='collapse' data-target='#" + key + count + "'>" +
-						"<span data-toggle='tooltip' title='klik for detail'>" +
-						"<label>" + key + " &nbsp;</label>" +
-						"<i class='fa fa-caret-right'></i>" +
-						"</span></div></div>" +
-						"<div id='" + key + count + "' class='box-gray collapse'></div>"
+							"<div><div id='collapse-" + key + count + "'class='space-detail btn  btn-default' type='button'" +
+							"data-toggle='collapse' data-target='#" + key + count + "'>" +
+							"<span data-toggle='tooltip' title='klik for detail'>" +
+							"<label>" + key + " &nbsp;</label>" +
+							"<i class='fa fa-caret-right'></i>" +
+							"</span></div></div>" +
+							"<div id='" + key + count + "' class='box-gray collapse'></div>"
 						);
 						//	if (key.length > 2)
 						//		$("#collapse"+key+count).append("<label>"+key+"</label>");
-						addDataDetail(data[key], count, key + count,1); // flag 1 karena akan di append pada ID
+						addDataDetail(data[key], count, key + count, 1); // flag 1 karena akan di append pada ID
 					}
 				} else {
 					//var id = key + count;
 					if ($("#dvName" + count).length == 0) {
-						console.log("masuk sini");
 						$(newSelector).append(
 							"<div class='space-pad' id='" + key + count + "'>" +
 							"<label>" + key + "</label>" +
@@ -500,8 +427,7 @@ $(function () {
 		}
 	}
 
-	function emptyDetail(stackFs)
-	{
+	function emptyDetail(stackFs) {
 		for (var key in stackFs) {
 			$("#" + stackFs[key]).empty();
 			stackFs[key] = null;
@@ -512,8 +438,8 @@ $(function () {
 		return obj === Object(obj);
 	}
 
-/* start function for tab */
-	function addTab(index,filename,callback) {
+	/* start function for tab */
+	function addTab(index, filename, callback) {
 		var flag = true; // belum guna
 		var filename2 = filename.split(".");
 		//index++;
@@ -521,9 +447,9 @@ $(function () {
 		if ($('#' + name).length == 0) {
 			$.tmpl(navTemp, { "index": index, fileName: filename }).insertAfter('.li-tab-toggle:last');
 			$.tmpl(tabTemp, { "index": index, fileName: filename2[0] }).appendTo('.tab-content');
-			var container = document.getElementById('mynetwork'+index);
+			var container = document.getElementById('mynetwork' + index);
 			updateTabs();
-			callback(filename,container,flag,index);
+			callback(filename, container, flag, index);
 		} else {
 			console.log("gagal");
 		}
@@ -546,7 +472,7 @@ $(function () {
 		} else {
 			$('a', nav).tab('show');
 		}
-		
+
 
 		updateTabs();
 	});

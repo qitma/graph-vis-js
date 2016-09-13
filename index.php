@@ -79,9 +79,6 @@
             </a>
         </li>
     </script>
-
-
-    
     <ul class="nav nav-tabs" id="tabs">
         <li class="li-tab-toggle active">
             <a class="tab-toggle " href="#tab1" id="toggle1" data-toggle="tab" alt="name file"></a>
@@ -113,41 +110,6 @@
             <div id="detail"></div>
         </div>
     </div>
-    
-    <!--<div class="panel panel-default">
-        <div class="panel-heading" role="tab" id="headingOne">
-            
-            <a class="btn btn-sm btn-success btn-colapse" id="btnAdd">
-                <i class="glyphicon glyphicon-plus"></i><span class="hidden-xs"> Add device</span>
-            </a>
-
-        </div>
-    </div> -->     
-<! -- end edit tab -->
-        
-        <div class="modal fade" id="myModal2">
-            <div class="modal-dialog" style="width:70%;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="false">×</button>
-                            <h4 class="modal-title"></h4>
-                    </div>
-                    <div class="container"></div>
-                    <div class="modal-body">
-                        <div id="dataInfo1"></div>
-                        <div id="mynetwork1" style="height:500px;width:100%"></div>
-                        <div class="space-pad">
-                        <a href="#" class="btn btn-primary" id="fit-graph2">Fit graph</a>
-                        </div>
-                        <div id="dataDetail2"></div>
-                    </div>
-                    <div class="modal-footer">	
-                        <a href="#" data-dismiss="modal" class="btn">Close</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-<!-- end modal -->
    </div>
 </body>
 </html>
