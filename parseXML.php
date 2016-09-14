@@ -90,7 +90,8 @@ class parseXML
 
         for($i = 0;$i<sizeof($arr);$i++)
         {
-            if(strcmp(strtoupper($arr[$i]['type']),"SQL")==0)
+            //if(strcmp(strtoupper($arr[$i]['type']),"SQL")==0)
+            if($arr[$i]['connection']!= null && $arr[$i]['connection']!='')
             {
                 $arr[$i]['connection'] = $this->getDetailConnection($arr[$i]['connection'],$connection);
             }
@@ -169,7 +170,8 @@ class parseXML
         $arr = array();
         foreach($node as $data)
         {
-            if(strcmp(strtoupper($data['type']),"SQL")==0)
+            //if(strcmp(strtoupper($data['type']),"SQL")==0)
+            if($data['connection']!=null && $data['connection']!="")
             {
                 $arr[] = $data['connection'];
             }

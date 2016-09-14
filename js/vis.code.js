@@ -6,6 +6,7 @@ $(function () {
 	hideForm();
 	var stack = new Array();
 	var stackF = new Array();
+	var DIR = "img/";
 
 	if ($('#toggle1').text() == "")
 		$('#toggle1').text("Nama File");
@@ -18,12 +19,13 @@ $(function () {
 		var formData = new FormData(this);
 		var container = document.getElementById('mynetwork');
 		var flag = false;
-		$('[id^=dataDetail]').remove();
+		$('[id^=detail]').empty();
+		$('#dvDetailGraph1').toggle(false);
 		getDataGraph(formData, container, flag);
 
 	});
 
-	$('#detailGraph1').click(function (e) {
+	$('#graphDetail1').click(function (e) {
 		e.preventDefault();
 		//idElement += 1;
 		var filename = $('#fileName1').text();
@@ -31,7 +33,7 @@ $(function () {
 		addTab(uniqID, filename, getDetailGraph); // filename pada parameter pertama dijadikan unique ID untuk postfix
 	})
 
-	$(document).on('click', ".tab-pane.active > .dvDetailGraph > .detailGraph", function (e) {
+	$(document).on('click', ".tab-pane.active > .dvDetailGraph > .graphDetail", function (e) {
 		e.preventDefault();
 		var filename = $(this).siblings('.fileName').text();
 		var uniqID = replaceDotString(trimString(filename));
@@ -64,7 +66,7 @@ $(function () {
 				//console.log(data);
 				//console.log(data.edge);
 				//console.log(data.node);
-				for (var key in data.node) {
+				/*for (var key in data.node) {
 					if (!data.node.hasOwnProperty(key)) continue;
 					data.node[key]['label'] = data.node[key]['name'];
 					data.node[key]['id'] = data.node[key]['name'];
@@ -79,7 +81,19 @@ $(function () {
 						data.node[key]['x'] = data.node[key]['GUI'].xloc;
 						data.node[key]['y'] = data.node[key]['GUI'].yloc;
 					}
-				}
+
+					if(data.node[key]['type'].toUpperCase().localeCompare("JOB")==0)
+					{
+						data.node[key]['image'] = DIR + 'job.png';
+						data.node[key]['shape'] = 'image';
+					}else if(data.node[key]['type'].toUpperCase().localeCompare("TRANS")==0)
+					{
+						data.node[key]['image'] = DIR + 'trans.png';
+						data.node[key]['shape'] = 'image';
+					}else{
+						data.node[key]['shape'] = 'box';
+					}
+				} */
 				var uniqueID = replaceDotString(trimString(data.info.name));
 				var ekstensionKTR = false;//default
 				var info;
@@ -134,7 +148,7 @@ $(function () {
 				//var data = JSON.parse(datas);
 				var uniqueID = replaceDotString(trimString(fileName));
 				var idLocal = index;
-				for (var key in data.node) {
+				/*for (var key in data.node) {
 					if (!data.node.hasOwnProperty(key)) continue;
 					data.node[key]['label'] = data.node[key]['name'];
 					data.node[key]['id'] = data.node[key]['name'];
@@ -150,7 +164,7 @@ $(function () {
 						data.node[key]['x'] = data.node[key]['GUI'].xloc;
 						data.node[key]['y'] = data.node[key]['GUI'].yloc;
 					}
-				}
+				}*/
 				var ekstensionKTR = false;//default
 				var info;
 				if (data.ekstension.localeCompare("ktr") == 0) {
@@ -175,6 +189,7 @@ $(function () {
 				})
 				network[uniqueID].on("deselectNode", function (params) {
 					removeDetail(stack);
+					$('.tab-pane.active > .dvDetailGraph').hide();
 				})
 				//this function be used for make detail graph fit to canvas,because at initialize detail graph ,this graph has zoomed
 				network[uniqueID].on("afterDrawing", function (ex) {
@@ -235,9 +250,55 @@ $(function () {
 		return obj;
 	}
 
+	function validateNode(node,ekstension) {
+		for (var key in node) {
+			if (!node.hasOwnProperty(key)) continue;
+			node[key]['label'] = node[key]['name'];
+			node[key]['id'] = node[key]['name'];
+			if (ekstension.localeCompare("kjb") == 0) {
+				if (node[key].hasOwnProperty('filename')) {
+					var fileName = node[key]['filename'].split("/");
+					node[key]['filename_'] = fileName[1];
+				}
+				node[key]['x'] = node[key].xloc;
+				node[key]['y'] = node[key].yloc;
+			} else {
+				node[key]['x'] = node[key]['GUI'].xloc;
+				node[key]['y'] = node[key]['GUI'].yloc;
+			}
+			node[key]['shape'] = 'image';
+			var type = node[key]['type'].toUpperCase();
+			var name = node[key]['name'].toUpperCase();
+			if (type.localeCompare("JOB") == 0) {
+				node[key]['image'] = DIR + 'job.png';
+			}else if (type.localeCompare("TRANS") == 0) {
+				node[key]['image'] = DIR + 'trans.png';
+			}else if(type.localeCompare("SQL") == 0){
+				node[key]['image'] = DIR + 'sql.png';
+			}else if(type.localeCompare("SCRIPTVALUEMOD") == 0){
+				node[key]['image'] = DIR + 'js.png';
+			}else if(type.localeCompare("SUCCESS") == 0){
+				node[key]['image'] = DIR + 'success.png';
+			}else if(type.localeCompare("ABORT") == 0){
+				node[key]['image'] = DIR + 'abort.png';
+			}else if(type.localeCompare("SPECIAL") == 0){
+				if(name.localeCompare("START") == 0){
+					node[key]['image'] = DIR + 'start.png';
+				}else if(name.localeCompare("DUMMY") == 0){
+					node[key]['image'] = DIR + 'dummy.png';
+				}
+			} else {
+				node[key]['shape'] = 'box';
+			}
+		}
+
+		return node;
+	}
+
 	function drawGraph(data, container,uniqueID) {
 
 		data.node = makeTitleNode(data.node);
+		validateNode(data.node,data.ekstension);
 		validateEdge(data.edge);
 		var nodes = new vis.DataSet(data.node);
 		var edges = new vis.DataSet(data.edge);
@@ -360,7 +421,7 @@ $(function () {
 					x: false,
 					y: false,
 				},
-				shape: 'box',
+				//shape: 'box',
 				font: {
 					size: 10,
 

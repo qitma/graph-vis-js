@@ -27,6 +27,7 @@
         #mynetwork {
             height: 500px;
             border: 1px solid lightgray;
+            background:white;
         }
     </style>
 
@@ -65,7 +66,7 @@
             </div>
             <div id="mynetwork${index}" style="clear:both;margin-top:20px;" class="network"></div>
             <div class="space-pad dvDetailGraph">
-                <button class="btn-default btn-primary btn detailGraph" style="text-align:right">Detail Graph</button> &nbsp;
+                <button class="btn-default btn-primary btn graphDetail" style="text-align:right">Detail Graph</button> &nbsp;
                 <label class="fileName"></label>
             </div>
             <div id="detail${index}"></div>
@@ -104,7 +105,7 @@
                 <div id="mynetwork" style="clear:both;margin-top:20px;"></div>
             </div>
             <div class="space-pad" id="dvDetailGraph1">
-                <button class="btn-default btn-primary btn" id="detailGraph1" style="text-align:right">Detail Graph</button> &nbsp;
+                <button class="btn-default btn-primary btn" id="graphDetail1" style="text-align:right">Detail Graph</button> &nbsp;
                 <label id="fileName1"></label>
             </div>
             <div id="detail"></div>
