@@ -149,23 +149,6 @@ $(function () {
 				//var data = JSON.parse(datas);
 				
 				var idLocal = index;
-				/*for (var key in data.node) {
-					if (!data.node.hasOwnProperty(key)) continue;
-					data.node[key]['label'] = data.node[key]['name'];
-					data.node[key]['id'] = data.node[key]['name'];
-					if (data.ekstension.localeCompare("kjb") == 0) {
-						if (data.node[key].hasOwnProperty('filename')) {
-							var fileName1 = data.node[key]['filename'].split("/");
-							data.node[key]['filename_'] = fileName1[1];
-						}
-						data.node[key]['x'] = data.node[key].xloc;
-						data.node[key]['y'] = data.node[key].yloc;
-					} else {
-						//console.log("masuk else");
-						data.node[key]['x'] = data.node[key]['GUI'].xloc;
-						data.node[key]['y'] = data.node[key]['GUI'].yloc;
-					}
-				}*/
 				var ekstensionKTR = false;//default
 				var info;
 				if (data.ekstension.localeCompare("ktr") == 0) {
@@ -268,9 +251,15 @@ $(function () {
 				node[key]['y'] = node[key]['GUI'].yloc;
 			}
 			node[key]['shape'] = 'image';
-			var type = node[key]['type'].toUpperCase();
-			var name = node[key]['name'].toUpperCase();
-			if (type.localeCompare("JOB") == 0) {
+			var type = node[key]['type'].toLowerCase();
+			var name = node[key]['name'].toLowerCase();
+			if(type.localeCompare("special") == 0)
+			{
+				node[key]['image'] = DIR + name + '.png';
+			}else{
+				node[key]['image'] = DIR + type + '.png';
+			}
+			/*if (type.localeCompare("JOB") == 0) {
 				node[key]['image'] = DIR + 'job.png';
 			}else if (type.localeCompare("TRANS") == 0) {
 				node[key]['image'] = DIR + 'trans.png';
@@ -290,7 +279,7 @@ $(function () {
 				}
 			} else {
 				node[key]['shape'] = 'box';
-			}
+			}*/
 		}
 
 		return node;
@@ -425,8 +414,8 @@ $(function () {
 				//shape: 'box',
 				font: {
 					size: 10,
-
-				}
+				},
+				brokenImage: DIR + "notfound.png"
 			},
 		};
 		return options;
@@ -513,7 +502,10 @@ $(function () {
 			updateTabs();
 			callback(filename, container, flag, index);
 		} else {
-			console.log("gagal");
+			console.log("masuk sini");
+			$('.li-tab-toggle a[href ="#tab'+index+'"]').tab('show');
+			//$('#'+name).append('<div><input type="text"></div>')
+			console.log('#'+name);
 		}
 	};
 
