@@ -56,7 +56,7 @@ $(function () {
 			processData: false,
 			contentType: false,
 			type: 'post',
-			url: 'http://localhost/graph-etl/handleRequest.php',
+			url: 'http://localhost/graph-vis-js/handleRequest.php',
 			data: formData,
 			success: function (datas, status) {
 				scrollToDownBottomOfPage();
@@ -134,19 +134,20 @@ $(function () {
 
 		$('.modal-title').text(fileName);
 		$('#tab' + index).find('.dvDetailGraph').hide();
+		var uniqueID = replaceDotString(trimString(fileName));
 		$.ajax({
 			// processData: false,
 			// contentType: json,
 			dataType: 'json',
 			type: 'post',
-			url: 'http://localhost/graph-etl/handleRequest.php',
+			url: 'http://localhost/graph-vis-js/handleRequest.php',
 			data: {
 				'fileName': fileName
 			},
 			success: function (data, status) {
 				//showModal(idElement);
 				//var data = JSON.parse(datas);
-				var uniqueID = replaceDotString(trimString(fileName));
+				
 				var idLocal = index;
 				/*for (var key in data.node) {
 					if (!data.node.hasOwnProperty(key)) continue;
@@ -205,8 +206,8 @@ $(function () {
 				network[uniqueID] = new vis.Network(container);
 				network[uniqueID].destroy();
 				state = false;
-				//$('#tabs li:last').remove(); // menghilangkan tab
-				//$('#tab'+index).remove(); // menghilangkan content dari tab
+				$('#tabs li:last').remove(); // menghilangkan tab
+				$('#tab'+index).remove(); // menghilangkan content dari tab
 			}
 		});
 
