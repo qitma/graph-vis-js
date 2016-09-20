@@ -17,6 +17,7 @@ class parseXML
         return $this->ekstension;
     }
 
+
     /*function getEdge()
     {
         $xmlElement = $this->xml;

@@ -63,37 +63,6 @@ $(function () {
 				//console.log(datas);
 				var data = JSON.parse(datas);
 				var idLocal = 1;
-				//console.log(data);
-				//console.log(data.edge);
-				//console.log(data.node);
-				/*for (var key in data.node) {
-					if (!data.node.hasOwnProperty(key)) continue;
-					data.node[key]['label'] = data.node[key]['name'];
-					data.node[key]['id'] = data.node[key]['name'];
-					if (data.ekstension.localeCompare("kjb") == 0) {
-						if (data.node[key].hasOwnProperty('filename')) {
-							var fileName = data.node[key]['filename'].split("/");
-							data.node[key]['filename_'] = fileName[1];
-						}
-						data.node[key]['x'] = data.node[key].xloc;
-						data.node[key]['y'] = data.node[key].yloc;
-					} else {
-						data.node[key]['x'] = data.node[key]['GUI'].xloc;
-						data.node[key]['y'] = data.node[key]['GUI'].yloc;
-					}
-
-					if(data.node[key]['type'].toUpperCase().localeCompare("JOB")==0)
-					{
-						data.node[key]['image'] = DIR + 'job.png';
-						data.node[key]['shape'] = 'image';
-					}else if(data.node[key]['type'].toUpperCase().localeCompare("TRANS")==0)
-					{
-						data.node[key]['image'] = DIR + 'trans.png';
-						data.node[key]['shape'] = 'image';
-					}else{
-						data.node[key]['shape'] = 'box';
-					}
-				} */
 				var uniqueID = replaceDotString(trimString(data.info.name));
 				var ekstensionKTR = false;//default
 				var info;
@@ -209,25 +178,28 @@ $(function () {
 	}
 
 
-	function validateEdge(edge) {
-		var enabledColor = 'green';
-		var disabledColor = 'gray';
-		var disableEvaluation = 'red';
+	function validateEdge(edge, ekstension) {
+		var enabledColorKJB = 'green';
+		var disabledColorKJB = '#CCC';
+		var disableEvaluationKJB = 'red';
+		var unconditionalKJB = '#3D6480';
+		var enabledColorKTR = '#3D6480';
+		var disabledColorKTR = '#CCC';
 		for (var key in edge) {
 			if (!edge.hasOwnProperty(key)) continue;
 			var obj = edge[key];
-			//obj['color'] = obj['enabled'].toUpperCase() == 'Y' ? enabledColor : disabledColor;
-			if (obj['enabled'].toUpperCase() == 'Y') {
-				obj['color'] = enabledColor;
-				//console.log(obj['enabled']);
-				//console.log(obj['evaluation']);
-				if (obj.hasOwnProperty('evaluation')) {
-					if (obj['evaluation'].toUpperCase() == 'N') {
-						obj['color'] = disableEvaluation;
-					}
+			if (ekstension.localeCompare("kjb") == 0) {
+				if (obj['enabled'].toUpperCase() == 'Y') {
+					obj['color'] = enabledColorKJB;
+					if (obj['evaluation'].toUpperCase() == 'N')
+						obj['color'] = disableEvaluationKJB;
+					if (obj['unconditional'].toUpperCase() == 'Y')
+						obj['color'] = unconditionalKJB;
+				} else {
+					obj['color'] = disabledColorKJB;
 				}
 			} else {
-				obj['color'] = disabledColor;
+				obj['color'] = obj['enabled'].toUpperCase() == 'Y' ? enabledColorKTR : disabledColorKTR;
 			}
 		}
 
@@ -289,7 +261,7 @@ $(function () {
 
 		data.node = makeTitleNode(data.node);
 		validateNode(data.node,data.ekstension);
-		validateEdge(data.edge);
+		validateEdge(data.edge,data.ekstension);
 		var nodes = new vis.DataSet(data.node);
 		var edges = new vis.DataSet(data.edge);
 
@@ -468,6 +440,8 @@ $(function () {
 			}//end if own property
 		}//end foreach
 	}
+	
+
 
 	/* fungsi untuk meremove element yg bersi data */
 	function removeDetail(stacks) {
